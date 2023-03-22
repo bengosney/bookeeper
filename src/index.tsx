@@ -4,12 +4,23 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { Provider } from 'use-pouchdb';
+import PouchDB from 'pouchdb-browser';
+import PouchDBFind from 'pouchdb-find';
+
+PouchDB.plugin(PouchDBFind);
+
+const db = new PouchDB('local')
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider pouchdb={db}>
+      <App />
+    </Provider>
   </React.StrictMode>
 );
 
