@@ -17,18 +17,16 @@ const remoteDB = new PouchDB(`http://127.0.0.1:5984/db`, {
     password: "password",
   },
 });
-db.sync(remoteDB, { live: true });
+db.sync(remoteDB, { live: true, retry: true });
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
   <React.StrictMode>
     <Provider pouchdb={db}>
       <App />
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function
