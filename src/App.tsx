@@ -3,6 +3,8 @@ import logo from "./logo.svg";
 import "./App.css";
 import { useDoc, usePouch, useFind, useAllDocs } from "use-pouchdb";
 import FindThing from "./FindThing";
+import { useBookLookup } from "./documents/book";
+
 
 interface docType {
   _id: string;
@@ -15,6 +17,8 @@ function App() {
   const db = usePouch();
 
   const { rows: docs, loading, error } = useAllDocs<docType>({ include_docs: true });
+  
+  const book = useBookLookup('9780552134620');
 
   if (error && !loading) {
     return <div>something went wrong: {error.message}</div>;
