@@ -1,4 +1,5 @@
 import { useDoc, usePouch, useFind, useAllDocs } from "use-pouchdb";
+import Scanner from "./Scanner";
 
 interface docType {
   _id: string;
@@ -28,11 +29,14 @@ const FindThing = () => {
   }
 
   return (
-    <ul>
-      {docs.map((doc) => (
-        <li key={doc._id}>{doc.title}</li>
-      ))}
-    </ul>
+    <div>
+      <ul>
+        {docs.map((doc) => (
+          <li key={doc._id}>{doc.title}</li>
+        ))}
+      </ul>
+      <Scanner />
+    </div>
   );
 };
 
