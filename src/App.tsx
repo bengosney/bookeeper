@@ -17,8 +17,8 @@ function App() {
 
   const { rows: docs, loading, error } = useAllDocs<docType>({ include_docs: true });
 
-  const book = useBookLookup("9780552134620");
-  console.log("book", book);
+  //const book = useBookLookup("9780552134620");
+  //console.log("book", book);
 
   if (error && !loading) {
     return <div>something went wrong: {error.message}</div>;

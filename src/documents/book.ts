@@ -1,10 +1,15 @@
 import { useEffect, useReducer, useState } from "react";
+import { BaseDoc } from "./_base";
 
 export interface Book {
   authors: string[];
   title: string;
   isbn: string;
-  cover: string;
+  cover: string | null;
+}
+
+export interface BookDoc extends BaseDoc, Book {
+  type: "book";
 }
 
 export interface LookupReturn {
@@ -20,6 +25,14 @@ interface GoogleBook {
     thumbnail: string;
   };
 }
+
+export const bookToDoc = (book: Book): BookDoc => {
+  return {
+    ...book,
+    type: "book",
+    _id: book.isbn,
+  };
+};
 
 const emptyReturn = (): LookupReturn => ({ book: undefined, looking: true });
 

@@ -1,11 +1,11 @@
 import Quagga from "@ericblade/quagga2";
 import { useEffect, useRef } from "react";
 
-const Scanner = () => {
+const Scanner = ({ on = true }: { on: boolean }) => {
   const targetRef = useRef(null);
   //*
   useEffect(() => {
-    if (targetRef.current !== null) {
+    if (targetRef.current !== null && on) {
       Quagga.init(
         {
           inputStream: {
