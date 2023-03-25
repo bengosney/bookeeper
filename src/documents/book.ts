@@ -1,11 +1,12 @@
-import { useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
+import { usePouch } from "use-pouchdb";
 import { BaseDoc } from "./_base";
 
 export interface Book {
   authors: string[];
   title: string;
   isbn: string;
-  cover: string | null;
+  cover: string | undefined;
 }
 
 export interface BookDoc extends BaseDoc, Book {
@@ -35,27 +36,32 @@ export const bookToDoc = (book: Book): BookDoc => {
 };
 
 const emptyReturn = (): LookupReturn => ({ book: undefined, looking: true });
+const toBook = (book: Book): Book => book;
+
+const fetchFromGoogle = (code: string): Promise<Book> => {
+  return fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${code}`)
+    .then((response) => response.json())
+    .then((data) => data.items[0].volumeInfo)
+    .then((data: GoogleBook) =>
+      toBook({
+        isbn: code,
+        authors: data.authors,
+        title: data.title,
+        cover: data.imageLinks.thumbnail,
+      }),
+    );
+};
 
 const useLookupGoogle = (code: string): LookupReturn => {
-  const [state, dispatch] = useReducer((state: LookupReturn, action: Book): LookupReturn => {
+  const [state, dispatch] = useReducer((state: LookupReturn, book: Book | undefined): LookupReturn => {
     return {
-      book: action,
+      book: book,
       looking: false,
     };
   }, emptyReturn());
 
   useEffect(() => {
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${code}`)
-      .then((response) => response.json())
-      .then((data) => data.items[0].volumeInfo)
-      .then((data: GoogleBook) => {
-        dispatch({
-          isbn: code,
-          authors: data.authors,
-          title: data.title,
-          cover: data.imageLinks.thumbnail,
-        });
-      });
+    fetchFromGoogle(code).then(dispatch);
   }, [code]);
 
   return state;
@@ -68,7 +74,7 @@ interface OpenBook {
       name: string;
       url: string;
     }>;
-    cover: {
+    cover?: {
       small: string;
       medium: string;
       large: string;
@@ -76,26 +82,30 @@ interface OpenBook {
   };
 }
 
+const fetchFromOpenLibrary = (code: string): Promise<Book> => {
+  return fetch(`https://openlibrary.org/api/books?bibkeys=${code}&jscmd=data&format=json`)
+    .then((response) => response.json())
+    .then((data: OpenBook) => data[code])
+    .then((data) =>
+      toBook({
+        authors: data.authors.map((obj) => obj.name),
+        cover: data.cover?.large || undefined,
+        title: data.title,
+        isbn: code,
+      }),
+    );
+};
+
 const useLookupOpenLibrary = (code: string): LookupReturn => {
-  const [state, dispatch] = useReducer((state: LookupReturn, action: Book): LookupReturn => {
+  const [state, dispatch] = useReducer((state: LookupReturn, book: Book | undefined): LookupReturn => {
     return {
-      book: action,
+      book: book,
       looking: false,
     };
   }, emptyReturn());
 
   useEffect(() => {
-    fetch(`https://openlibrary.org/api/books?bibkeys=${code}&jscmd=data&format=json`)
-      .then((response) => response.json())
-      .then((data: OpenBook) => data[code])
-      .then((data) => {
-        dispatch({
-          authors: data.authors.map((obj) => obj.name),
-          cover: data.cover.large,
-          title: data.title,
-          isbn: code,
-        });
-      });
+    fetchFromOpenLibrary(code).then(dispatch);
   }, [code]);
 
   return state;
@@ -108,5 +118,25 @@ export const useBookLookup = (code: string): LookupReturn => {
   return {
     book: googleBook.book || openBook.book,
     looking: googleBook.looking && openBook.looking,
+  };
+};
+
+export const fetchBook = (code: string): Promise<Book> => {
+  return fetchFromGoogle(code).catch(() => fetchFromOpenLibrary(code));
+};
+
+export const useBookRefresh = () => {
+  const db = usePouch();
+
+  return async (oldBook: BookDoc) => {
+    if (!oldBook.cover) {
+      try {
+        await db.put({
+          _id: `refresh-queue-${oldBook._id}`,
+          type: "refresh-queue",
+          isbn: oldBook._id,
+        });
+      } catch (err) {}
+    }
   };
 };

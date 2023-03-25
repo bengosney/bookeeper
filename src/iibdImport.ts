@@ -42,7 +42,7 @@ export const useImport = (username: string, password: string) => {
       title: book.title,
       authors: book.authors.map((a) => a.name),
       isbn: book.isbn,
-      cover: book.tmp_cover,
+      cover: book.tmp_cover || undefined,
     };
   };
 

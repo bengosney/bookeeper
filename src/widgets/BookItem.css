@@ -1,0 +1,8 @@
+.book {
+    flex-basis: 8rem;
+}
+
+.book img {
+    max-width: 100%;
+    height: auto;
+}

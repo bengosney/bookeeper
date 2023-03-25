@@ -7,8 +7,10 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "use-pouchdb";
 import PouchDB from "pouchdb-browser";
 import PouchDBFind from "pouchdb-find";
+import PouchUpsert from "pouchdb-upsert";
 
 PouchDB.plugin(PouchDBFind);
+PouchDB.plugin(PouchUpsert);
 
 const db = new PouchDB("local");
 const remoteDB = new PouchDB(`http://127.0.0.1:5984/db`, {
