@@ -1,7 +1,7 @@
 import { useFind } from "use-pouchdb";
 import { BookDoc, useBookRefresh } from "../documents/book";
 import BookItem from "./BookItem";
-import "./BookList.css";
+import "./BookList.scss";
 
 type BookFields = keyof BookDoc;
 const BookList = () => {

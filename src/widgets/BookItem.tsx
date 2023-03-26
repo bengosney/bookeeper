@@ -1,5 +1,5 @@
 import { BookDoc } from "../documents/book";
-import "./BookItem.css";
+import "./BookItem.scss";
 
 interface BookItemProps {
   book: BookDoc;
@@ -8,17 +8,21 @@ interface BookItemProps {
 const BookCover = ({ book }: BookItemProps) => {
   if (book.cover) {
     return <img src={book.cover} loading="lazy" />;
-  } else {
-    return <div className="cover">{book.title}</div>;
   }
+  return (
+    <span className="default">
+      <span className="authors">{book.authors.join(", ")}</span>
+      <span className="title">{book.title}</span>
+    </span>
+  );
 };
 
 const BookItem = ({ book }: BookItemProps) => {
   return (
     <div className="book">
-      <BookCover book={book} />
-      <div>{book.title}</div>
-      <small>ISBN: {book.isbn}</small>
+      <div className="cover">
+        <BookCover book={book} />
+      </div>
     </div>
   );
 };

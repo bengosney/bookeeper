@@ -136,7 +136,7 @@ export const useBookRefresh = () => {
 
   useEffect(() => {
     if (docs.length) {
-      const interval = setInterval(() => {
+      const interval = setTimeout(() => {
         const doc = docs[Math.floor(Math.random() * docs.length)];
         fetchBook(doc._id).then((remoteBook) => {
           db.get<BookDoc>(remoteBook.isbn).then((book) => {
