@@ -31,8 +31,6 @@ const BookList = () => {
     return <div>Loading...</div>;
   }
 
-  books.splice(0, 1).forEach(refetch);
-
   return (
     <div className="books">
       {books.map((book) => (

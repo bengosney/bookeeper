@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useState } from "react";
-import { usePouch } from "use-pouchdb";
+import { useFind, usePouch } from "use-pouchdb";
 import { BaseDoc } from "./_base";
 
 export interface Book {
@@ -127,16 +127,26 @@ export const fetchBook = (code: string): Promise<Book> => {
 
 export const useBookRefresh = () => {
   const db = usePouch();
+  const { docs, loading, error } = useFind<BookDoc>({
+    selector: {
+      type: "book",
+      cover: null,
+    },
+  });
 
-  return async (oldBook: BookDoc) => {
-    if (!oldBook.cover) {
-      try {
-        await db.put({
-          _id: `refresh-queue-${oldBook._id}`,
-          type: "refresh-queue",
-          isbn: oldBook._id,
+  useEffect(() => {
+    if (docs.length) {
+      const interval = setInterval(() => {
+        const doc = docs[Math.floor(Math.random() * docs.length)];
+        fetchBook(doc._id).then((remoteBook) => {
+          db.get<BookDoc>(remoteBook.isbn).then((book) => {
+            book.cover = remoteBook.cover;
+            db.put(book);
+          });
         });
-      } catch (err) {}
+      }, 5000);
+
+      return () => clearTimeout(interval);
     }
-  };
+  }, [docs]);
 };
