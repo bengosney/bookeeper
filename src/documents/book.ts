@@ -140,7 +140,6 @@ export const useBookRefresh = () => {
     if (docs.length) {
       const interval = setInterval(() => {
         const doc = docs[Math.floor(Math.random() * docs.length)];
-        console.log("lookups", lookups);
         addLookup();
         fetchBook(doc._id).then((remoteBook) => {
           db.get<BookDoc>(remoteBook.isbn).then((book) => {
