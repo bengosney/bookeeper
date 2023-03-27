@@ -11,8 +11,9 @@ install: node_modules
 
 couchdb:
 	$(DOCKER) pull couchdb
-	$(DOCKER) container inspect couchdb | grep '"Status": "running"' || $(DOCKER) start couchdb && sleep 1
+	$(DOCKER) container inspect couchdb | grep '"Status": "running"' || $(DOCKER) start couchdb || true
 	$(DOCKER) container inspect couchdb 1>/dev/null || $(DOCKER) run -d -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password --name couchdb couchdb
+	sleep 1
 	npx add-cors-to-couchdb -u admin -p password
 
 dev: install couchdb

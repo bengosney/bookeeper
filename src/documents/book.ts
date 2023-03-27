@@ -130,23 +130,31 @@ export const useBookRefresh = () => {
   const { docs, loading, error } = useFind<BookDoc>({
     selector: {
       type: "book",
-      cover: null,
+      cover: { $exists: false },
     },
   });
+  const [lookups, setLookups] = useState(0);
+  const addLookup = () => setLookups((lookups) => lookups + 1);
 
   useEffect(() => {
     if (docs.length) {
-      const interval = setTimeout(() => {
+      const interval = setInterval(() => {
         const doc = docs[Math.floor(Math.random() * docs.length)];
+        console.log("lookups", lookups);
+        addLookup();
         fetchBook(doc._id).then((remoteBook) => {
           db.get<BookDoc>(remoteBook.isbn).then((book) => {
             book.cover = remoteBook.cover;
             db.put(book);
           });
         });
+
+        if (lookups > docs.length * 2) {
+          clearInterval(interval);
+        }
       }, 5000);
 
-      return () => clearTimeout(interval);
+      return () => clearInterval(interval);
     }
   }, [docs]);
 };
