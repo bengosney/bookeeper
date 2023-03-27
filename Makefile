@@ -17,3 +17,6 @@ couchdb:
 	npx add-cors-to-couchdb -u admin -p password
 
 dev: install couchdb
+
+cors:
+	npx add-cors-to-couchdb -u ***REMOVED*** -p ***REMOVED*** https://***REMOVED***

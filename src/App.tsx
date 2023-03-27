@@ -1,8 +1,10 @@
 import "./App.scss";
 import BookList from "./widgets/BookList";
 import { Outlet, Link } from "react-router-dom";
+import usePouchSync from "./hooks/pouchSync";
 
 function App() {
+  usePouchSync();
   return (
     <div className="App">
       <h1>Bookeeper</h1>

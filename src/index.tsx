@@ -18,13 +18,6 @@ PouchDB.plugin(PouchDBFind);
 PouchDB.plugin(PouchUpsert);
 
 const db = new PouchDB("bookeeper", { auto_compaction: true });
-const remoteDB = new PouchDB(`http://127.0.0.1:5984/db`, {
-  auth: {
-    username: "admin",
-    password: "password",
-  },
-});
-db.sync(remoteDB, { live: true, retry: true });
 
 const router = createBrowserRouter([
   {
