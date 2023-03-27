@@ -5,14 +5,19 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 import { Provider } from "use-pouchdb";
+
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import PouchDB from "pouchdb-browser";
 import PouchDBFind from "pouchdb-find";
 import PouchUpsert from "pouchdb-upsert";
+import BookList from "./widgets/BookList";
+import Settings from "./Settings";
 
 PouchDB.plugin(PouchDBFind);
 PouchDB.plugin(PouchUpsert);
 
-const db = new PouchDB("local");
+const db = new PouchDB("bookeeper", { auto_compaction: true });
 const remoteDB = new PouchDB(`http://127.0.0.1:5984/db`, {
   auth: {
     username: "admin",
@@ -21,12 +26,29 @@ const remoteDB = new PouchDB(`http://127.0.0.1:5984/db`, {
 });
 db.sync(remoteDB, { live: true, retry: true });
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "books",
+        element: <BookList />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
+    ],
+  },
+]);
+
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
   <React.StrictMode>
     <Provider pouchdb={db}>
-      <App />
+      <RouterProvider router={router} />
     </Provider>
   </React.StrictMode>,
 );

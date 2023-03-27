@@ -2,7 +2,8 @@
 @use "sass:math";
 
 .book {
-  flex-basis: 8rem;
+  flex-basis: 10rem;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -12,17 +13,21 @@
       0px 5px 5px 0px rgba(119, 119, 119, 0.3);
     content: " ";
     height: 1em;
-    width: calc(100% + 1.5em);
-    margin-left: -0.75em;
+    width: 100%;
   }
 
   .cover {
-    box-shadow: 0px -5px 20px 2px rgba(0, 0, 0, 0.3);
+    & > * {
+      box-shadow: 0px -5px 20px 2px rgba(0, 0, 0, 0.3);
+      width: 8rem;
+      margin: auto;
+    }
     position: relative;
 
     img {
       max-width: 100%;
       height: auto;
+      display: block;
     }
 
     .default {

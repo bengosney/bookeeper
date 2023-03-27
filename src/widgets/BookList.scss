@@ -3,4 +3,9 @@
   flex-wrap: wrap;
 
   gap: 3rem;
+
+  &:after {
+    content: " ";
+    flex-grow: 10;
+  }
 }
