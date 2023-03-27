@@ -17,3 +17,6 @@ couchdb:
 	npx add-cors-to-couchdb -u admin -p password
 
 dev: install couchdb
+
+cors:
+	npx add-cors-to-couchdb -u bengosney@googlemail.com -p JiykBHeh.FVZT3t https://300c058f-1ab1-4a2a-b87b-09f5ed8cdbd0-bluemix.cloudantnosqldb.appdomain.cloud
