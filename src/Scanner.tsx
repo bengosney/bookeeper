@@ -1,7 +1,14 @@
 import Quagga from "@ericblade/quagga2";
 import { useEffect, useRef } from "react";
 
-const Scanner = ({ on = true }: { on: boolean }) => {
+import "./Scanner.scss";
+
+interface ScannerProps {
+  on?: boolean;
+  modal?: boolean;
+}
+
+const Scanner = ({ on = true, modal = true }: ScannerProps) => {
   const targetRef = useRef(null);
 
   useEffect(() => {
@@ -24,12 +31,29 @@ const Scanner = ({ on = true }: { on: boolean }) => {
           }
           console.log("Initialization finished. Ready to start");
           Quagga.start();
+          Quagga.onDetected((data) => {
+            Quagga.pause();
+            console.log("scanned", data);
+          });
         },
       );
     }
+
+    return () => {
+      Quagga.stop();
+    };
   }, [targetRef]);
 
-  return <div ref={targetRef}></div>;
+  const classes = ["scanner"];
+  if (modal) {
+    classes.push("modal");
+  }
+
+  return (
+    <div className={classes.join(" ")}>
+      <div ref={targetRef}></div>
+    </div>
+  );
 };
 
 export default Scanner;

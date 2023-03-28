@@ -13,6 +13,7 @@ import PouchDBFind from "pouchdb-find";
 import PouchUpsert from "pouchdb-upsert";
 import BookList from "./widgets/BookList";
 import Settings from "./Settings";
+import Scanner from "./Scanner";
 
 PouchDB.plugin(PouchDBFind);
 PouchDB.plugin(PouchUpsert);
@@ -27,6 +28,12 @@ const router = createBrowserRouter([
       {
         path: "books",
         element: <BookList />,
+        children: [
+          {
+            path: "scan",
+            element: <Scanner on={true} modal={true} />,
+          },
+        ],
       },
       {
         path: "settings",

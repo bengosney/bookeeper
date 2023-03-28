@@ -1,12 +1,13 @@
 import { useFind } from "use-pouchdb";
-import { BookDoc, useBookRefresh } from "../documents/book";
+import { Outlet, Link } from "react-router-dom";
+import { BookDoc, Cover, useBookRefresh } from "../documents/book";
 import BookItem from "./BookItem";
 import "./BookList.scss";
 
 type BookFields = keyof BookDoc;
 const BookList = () => {
   const fieldList: BookFields[] = ["_id", "title", "authors", "cover", "isbn"];
-  const refetch = useBookRefresh();
+  useBookRefresh();
 
   const {
     docs: books,
@@ -32,10 +33,13 @@ const BookList = () => {
   }
 
   return (
-    <div className="books">
-      {books.map((book) => (
-        <BookItem key={book._id} book={book} />
-      ))}
+    <div>
+      <Outlet />
+      <div className="books">
+        {books.map((book) => (
+          <BookItem key={book._id} book={book} />
+        ))}
+      </div>
     </div>
   );
 };
