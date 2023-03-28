@@ -1,5 +1,7 @@
 import Quagga from "@ericblade/quagga2";
 import { useEffect, useRef } from "react";
+import { Outlet, Link } from "react-router-dom";
+import { useAddBook } from "./documents/book";
 
 import "./Scanner.scss";
 
@@ -10,6 +12,7 @@ interface ScannerProps {
 
 const Scanner = ({ on = true, modal = true }: ScannerProps) => {
   const targetRef = useRef(null);
+  const addBook = useAddBook();
 
   useEffect(() => {
     if (targetRef.current !== null && on) {
@@ -32,17 +35,22 @@ const Scanner = ({ on = true, modal = true }: ScannerProps) => {
           console.log("Initialization finished. Ready to start");
           Quagga.start();
           Quagga.onDetected((data) => {
-            Quagga.pause();
-            console.log("scanned", data);
+            if (data.codeResult.code) {
+              console.log("found and searching", data.codeResult.code);
+              Quagga.pause();
+              addBook(data.codeResult.code).then(() => Quagga.start());
+            }
           });
         },
       );
     }
 
     return () => {
+      Quagga.offProcessed();
+      Quagga.offDetected();
       Quagga.stop();
     };
-  }, [targetRef]);
+  }, [targetRef, on]);
 
   const classes = ["scanner"];
   if (modal) {
@@ -52,6 +60,7 @@ const Scanner = ({ on = true, modal = true }: ScannerProps) => {
   return (
     <div className={classes.join(" ")}>
       <div ref={targetRef}></div>
+      <Link to="/books/">Close</Link>
     </div>
   );
 };

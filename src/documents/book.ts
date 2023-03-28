@@ -131,6 +131,19 @@ export const fetchBook = (code: string): Promise<Book> => {
   return fetchFromGoogle(code).catch(() => fetchFromOpenLibrary(code));
 };
 
+export const useAddBook = () => {
+  const db = usePouch();
+
+  return (isbn: string) => {
+    return db.get(isbn).catch((err) => {
+      if (err.status == 404) {
+        console.log(`looking up ${isbn}`);
+        return fetchBook(isbn).then((book) => db.put(bookToDoc(book)));
+      }
+    });
+  };
+};
+
 export const useBookRefresh = () => {
   const db = usePouch();
   const { docs, loading, error } = useFind<BookDoc>({
