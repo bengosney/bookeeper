@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useState } from "react";
-import { useFind, usePouch } from "use-pouchdb";
+import { useDoc, useFind, usePouch } from "use-pouchdb";
 import { BaseDoc } from "./_base";
 
 export interface Book {
@@ -7,6 +7,12 @@ export interface Book {
   title: string;
   isbn: string;
   cover: string | undefined;
+  _attachments?: {
+    "cover.png": {
+      content_type: "image/png";
+      data: string;
+    };
+  };
 }
 
 export interface BookDoc extends BaseDoc, Book {
@@ -156,4 +162,41 @@ export const useBookRefresh = () => {
       return () => clearInterval(interval);
     }
   }, [docs]);
+};
+
+// Failed attempt at storing covers, can't download them because of CORS :(
+export const Cover = ({ id }: { id: string }) => {
+  const db = usePouch();
+  const { doc: book } = useDoc<BookDoc>(id);
+  const [image, setImage] = useState<Blob | null>(null);
+
+  const coverImageName = "cover.png";
+
+  useEffect(() => {
+    if (book) {
+      db.getAttachment(book._id, coverImageName)
+        .then((data) => {
+          if ("size" in data && data.size > 0) {
+            return db.removeAttachment(book._id, coverImageName, book._rev);
+          } else {
+          }
+        })
+        .catch((err) => {
+          if (err.name == "not_found" && book.cover) {
+            fetch(book.cover)
+              .then((response) => response.blob())
+              .then((blob) => {
+                if (blob.size > 0) {
+                  return db.putAttachment(book._id, coverImageName, book._rev, blob, blob.type);
+                }
+              })
+              .catch((err) => console.log("Fetch error", err));
+          } else {
+            console.log("err?", err);
+          }
+        });
+    }
+  }, [book]);
+
+  return null;
 };

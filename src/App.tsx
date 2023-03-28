@@ -11,6 +11,7 @@ function App() {
       <nav>
         <Link to={"/"}>Home</Link>
         <Link to={"/books/"}>Book Shelf</Link>
+        <Link to={"/books/scan"}>Scanner</Link>
         <Link to={"/settings/"}>Settings</Link>
       </nav>
       <Outlet />
