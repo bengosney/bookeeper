@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 const Scanner = ({ on = true }: { on: boolean }) => {
   const targetRef = useRef(null);
-  //*
+
   useEffect(() => {
     if (targetRef.current !== null && on) {
       Quagga.init(
@@ -28,7 +28,6 @@ const Scanner = ({ on = true }: { on: boolean }) => {
       );
     }
   }, [targetRef]);
-  //*/
 
   return <div ref={targetRef}></div>;
 };

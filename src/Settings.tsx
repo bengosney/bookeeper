@@ -1,4 +1,6 @@
+import { QrScanner } from "@yudiel/react-qr-scanner";
 import { useReducer, useState } from "react";
+import QRCode from "react-qr-code";
 import { CouchdbSettings, defaultSettings } from "./hooks/pouchSync";
 import { useLocalStorage } from "./hooks/settings";
 
@@ -17,6 +19,11 @@ const Settings = () => {
   }, settings);
 
   const [message, setMessage] = useState<string | undefined>();
+  const [showQR, setShowQR] = useState<boolean>(false);
+  const toggleQR = () => setShowQR((cur) => !cur);
+
+  const [showScan, setShowScan] = useState<boolean>(false);
+  const toggleScan = () => setShowScan((cur) => !cur);
 
   const save = () => {
     setSettings(state);
@@ -26,6 +33,14 @@ const Settings = () => {
   return (
     <div>
       {message ? <div>{message}</div> : null}
+      <div>
+        {showQR ? (
+          <div style={{ background: "white", padding: "16px" }}>
+            <QRCode value={JSON.stringify(settings)} />
+          </div>
+        ) : null}
+        <button onClick={() => toggleQR()}>{showQR ? "Hide" : "Show"} QR Code</button>
+      </div>
       <div>
         <label htmlFor="couchdb_database">Sync Database</label>
         <input
@@ -63,6 +78,24 @@ const Settings = () => {
       </div>
       <div>
         <button onClick={() => save()}>Save</button>
+      </div>
+      <hr />
+      <div>
+        {showScan ? (
+          <QrScanner
+            onDecode={(result) => {
+              const scannedSettings = JSON.parse(result);
+              const keys: Array<keyof CouchdbSettings> = ["database", "password", "server", "username"];
+              keys.forEach((key) => {
+                if (key in scannedSettings) {
+                  dispatch({ field: key, value: scannedSettings[key] });
+                }
+              });
+            }}
+            onError={(error) => setMessage(error?.message)}
+          />
+        ) : null}
+        <button onClick={() => toggleScan()}>{showScan ? "Hide" : "Show"} QR Scanner</button>
       </div>
     </div>
   );
