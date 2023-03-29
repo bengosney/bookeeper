@@ -1,3 +1,4 @@
+import { Outlet, Link } from "react-router-dom";
 import { BookDoc } from "../documents/book";
 import "./BookItem.scss";
 
@@ -18,11 +19,15 @@ const BookCover = ({ book }: BookItemProps) => {
 };
 
 const BookItem = ({ book }: BookItemProps) => {
+  const classes = ["book"];
+  if (book.finished) {
+    classes.push("finished");
+  }
   return (
-    <div className="book">
-      <div className="cover">
+    <div className={classes.join(" ")}>
+      <Link to={book._id} className="cover">
         <BookCover book={book} />
-      </div>
+      </Link>
     </div>
   );
 };

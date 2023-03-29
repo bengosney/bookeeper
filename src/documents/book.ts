@@ -7,6 +7,7 @@ export interface Book {
   title: string;
   isbn: string;
   cover: string | undefined;
+  finished?: boolean;
   _attachments?: {
     "cover.png": {
       content_type: "image/png";

@@ -1,0 +1,10 @@
+@import "../_modal.scss";
+
+.details {
+  @extend %modal;
+
+  & > * {
+    background: white;
+    padding: 1rem;
+  }
+}
