@@ -60,7 +60,7 @@ const Scanner = ({ on = true, modal = true }: ScannerProps) => {
   return (
     <div className={classes.join(" ")}>
       <div ref={targetRef}></div>
-      <Link to="/books/">Close</Link>
+      <Link to="../">Close</Link>
     </div>
   );
 };
