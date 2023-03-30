@@ -33,14 +33,14 @@ const BookList = () => {
   }
 
   return (
-    <div>
-      <Outlet />
+    <>
       <div className="books">
         {books.map((book) => (
           <BookItem key={book._id} book={book} />
         ))}
       </div>
-    </div>
+      <Outlet />
+    </>
   );
 };
 
