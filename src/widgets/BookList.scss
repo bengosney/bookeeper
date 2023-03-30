@@ -19,3 +19,15 @@
   display: flex;
   flex-direction: column;
 }
+
+.search-box {
+  padding: 0 1rem 1rem;
+  display: flex;
+
+  input {
+    font-size: 0.75rem;
+    padding: 1em;
+    display: block;
+    flex-grow: 1;
+  }
+}
