@@ -1,13 +1,6 @@
-@import "../_modal.scss";
-
-@mixin shadow($size: 1) {
-  box-shadow: 0px -5px (3px * $size) 0px rgba(170, 170, 170, 0.2), 0px 15px (20px * $size) 0px rgba(170, 170, 170, 0.7),
-    0px 5px (5px * $size) 0px rgba(119, 119, 119, 0.3);
-}
+@import "../_helpers.scss";
 
 .details {
-  @extend %modal;
-
   & > * {
     background: white;
     padding: 1rem;

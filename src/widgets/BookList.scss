@@ -1,11 +1,21 @@
+@import "../_helpers.scss";
+
 .books {
   display: flex;
   flex-wrap: wrap;
-
+  overflow-y: scroll;
+  padding: 2rem 1.5rem;
   gap: 3rem;
+
+  @include scroll-shadow-vertical();
 
   &:after {
     content: " ";
     flex-grow: 10;
   }
+}
+
+.book-list {
+  display: flex;
+  flex-direction: column;
 }
