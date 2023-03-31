@@ -195,20 +195,7 @@ export const Cover = ({ id }: { id: string }) => {
           } else {
           }
         })
-        .catch((err) => {
-          if (err.name == "not_found" && book.cover) {
-            fetch(book.cover)
-              .then((response) => response.blob())
-              .then((blob) => {
-                if (blob.size > 0) {
-                  return db.putAttachment(book._id, coverImageName, book._rev, blob, blob.type);
-                }
-              })
-              .catch((err) => console.log("Fetch error", err));
-          } else {
-            console.log("err?", err);
-          }
-        });
+        .catch((err) => {});
     }
   }, [book]);
 
