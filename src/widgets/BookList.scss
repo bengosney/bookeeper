@@ -29,5 +29,16 @@
     padding: 1em;
     display: block;
     flex-grow: 1;
+
+    $offset: 5px;
+
+    transition: 0.2s ease-in-out box-shadow;
+    border: none;
+    box-shadow: 0px -5px 3px 0px rgba(170, 170, 170, 0.2), 0px 2px 5px 0px rgba(170, 170, 170, 0.25),
+      0px 5px 5px 0px rgba(119, 119, 119, 0.3);
+
+    &:focus {
+      outline: none;
+    }
   }
 }
