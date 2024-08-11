@@ -8,7 +8,7 @@ interface BookItemProps {
 
 const BookCover = ({ book }: BookItemProps) => {
   if (book.cover) {
-    return <img src={book.cover} loading="lazy" />;
+    return <img src={book.cover.replace(/^http(s)?:/, "")} loading="lazy" />;
   }
   return (
     <span className="default">
