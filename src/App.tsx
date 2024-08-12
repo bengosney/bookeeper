@@ -1,13 +1,19 @@
 import "./App.scss";
-import { Outlet, Link } from "react-router-dom";
+import { useAllDocs } from "use-pouchdb";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import usePouchSync from "./hooks/pouchSync";
 
 function App() {
   usePouchSync();
+  const location = useLocation();
+
+  const isBasePath: boolean = location.pathname === "/";
+  const { total_rows: docCount } = useAllDocs({ include_docs: false });
+
   return (
     <div className="App">
       <header>
-        <h1>Bookeeper</h1>
+        <h1>Bookkeeper</h1>
         <nav>
           <Link to={"/"}>Home</Link>
           <Link to={"/books/"}>Book Shelf</Link>
@@ -16,6 +22,12 @@ function App() {
         </nav>
       </header>
       <Outlet />
+      {isBasePath && (
+        <div className="dashboard">
+          <p>Welcome to the Bookkeeper app!</p>
+          <p>{docCount} books tracked</p>
+        </div>
+      )}
     </div>
   );
 }
