@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "BookKeeper",
+  "name": "Book Keeper",
   "icons": [
     {
       "src": "favicon.ico",
