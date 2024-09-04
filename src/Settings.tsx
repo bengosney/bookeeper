@@ -46,16 +46,8 @@ const Settings = () => {
   };
 
   return (
-    <div>
+    <div className="form">
       {message ? <div>{message}</div> : null}
-      <div>
-        {showQR ? (
-          <div style={{ background: "white", padding: "16px" }}>
-            <QRCode value={JSON.stringify(settings)} />
-          </div>
-        ) : null}
-        <button onClick={() => toggleQR()}>{showQR ? "Hide" : "Show"} QR Code</button>
-      </div>
       <Input
         name="couchdb_database"
         value={state.database}
@@ -93,21 +85,31 @@ const Settings = () => {
       </div>
       <hr />
       <div>
-        {showScan ? (
-          <QrScanner
-            onDecode={(result) => {
-              const scannedSettings = JSON.parse(result);
-              const keys: Array<keyof CouchdbSettings> = ["database", "password", "server", "username"];
-              keys.forEach((key) => {
-                if (key in scannedSettings) {
-                  dispatch({ field: key, value: scannedSettings[key] });
-                }
-              });
-            }}
-            onError={(error) => setMessage(error?.message)}
-          />
+        <button onClick={() => toggleQR()}>{showQR ? "Hide" : "Show"} Settings QR Code</button>
+        {showQR ? (
+          <div className="qr-code">
+            <QRCode value={JSON.stringify(settings)} />
+          </div>
         ) : null}
-        <button onClick={() => toggleScan()}>{showScan ? "Hide" : "Show"} QR Scanner</button>
+      </div>
+      <div>
+        <button onClick={() => toggleScan()}>{showScan ? "Hide" : "Show"} Settings QR Scanner</button>
+        {showScan ? (
+          <div className="qr-scanner">
+            <QrScanner
+              onDecode={(result) => {
+                const scannedSettings = JSON.parse(result);
+                const keys: Array<keyof CouchdbSettings> = ["database", "password", "server", "username"];
+                keys.forEach((key) => {
+                  if (key in scannedSettings) {
+                    dispatch({ field: key, value: scannedSettings[key] });
+                  }
+                });
+              }}
+              onError={(error) => setMessage(error?.message)}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

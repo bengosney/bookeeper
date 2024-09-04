@@ -13,16 +13,19 @@ const BookDetail = () => {
   return (
     <div className="details">
       <div>
-        <div>Title: {book.title}</div>
-        <div>Authors: {book.authors.join(", ")}</div>
-        <div>ISBN: {book.isbn}</div>
-
+        <div className="info-grid">
+          <div>Title: {book.title}</div>
+          <div>Authors: {book.authors.join(", ")}</div>
+          <div>ISBN: {book.isbn}</div>
+        </div>
         <div className="buttons">
           <Form method="post" id="mark-as-read">
             <input type="hidden" id="finished" name="finished" value={book.finished ? "false" : "true"} />
             <button type="submit">{!book.finished ? "Mark as read" : "Mark as not read"}</button>
           </Form>
-          <Link to="../">Close</Link>
+          <Link to="../" className="button">
+            Close
+          </Link>
         </div>
       </div>
     </div>
