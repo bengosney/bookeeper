@@ -6,6 +6,13 @@
     padding: 1rem;
     max-width: 95vw;
     width: 640px;
+    box-sizing: border-box;
+  }
+
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
   }
 
   .buttons {
@@ -13,24 +20,11 @@
     justify-content: space-between;
     margin-top: 1rem;
 
-    button,
     a {
-      background: white;
-      padding: 0.25em 0.5em;
-      margin: 0.5em 0;
-      border-radius: 0.25em;
-      border: none;
-      font-size: 1rem;
-      color: inherit;
-      font-family: inherit;
-      text-decoration: none;
-
-      @include shadow(1);
       transition: all 0.2s ease-in-out;
 
       &:hover {
         cursor: pointer;
-        @include shadow(0.5);
       }
     }
   }
