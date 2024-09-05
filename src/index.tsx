@@ -15,6 +15,8 @@ import Settings from "./Settings";
 import Scanner from "./Scanner";
 import BookDetail from "./widgets/BookDetail";
 
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+
 PouchDB.plugin(PouchDBFind);
 PouchDB.plugin(PouchUpsert);
 
@@ -70,3 +72,5 @@ root.render(
     </Provider>
   </React.StrictMode>,
 );
+
+serviceWorkerRegistration.register();
