@@ -49,7 +49,7 @@ const router = createBrowserRouter([
                 return null;
               }
               return db.upsert(params.book_id, (doc) => {
-                return { ...doc, finished: finished == "true" ? true : false };
+                return { ...doc, finished: finished === "true" ? true : false };
               });
             },
           },
