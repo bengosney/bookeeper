@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useReducer, useState } from "react";
-import { useDoc, useFind, usePouch } from "use-pouchdb";
+import { useEffect, useReducer, useState } from "react";
+import { useFind, usePouch } from "use-pouchdb";
 import { BaseDoc } from "./_base";
 
 export interface Book {
@@ -9,8 +9,8 @@ export interface Book {
   cover: string | undefined;
   finished?: boolean;
   _attachments?: {
-    "cover.png": {
-      content_type: "image/png";
+    [key: string]: {
+      content_type: string;
       data: string;
     };
   };
@@ -137,7 +137,7 @@ export const useAddBook = () => {
 
   return (isbn: string) => {
     return db.get(isbn).catch((err) => {
-      if (err.status == 404) {
+      if (err.status === 404) {
         console.log(`looking up ${isbn}`);
         return fetchBook(isbn).then((book) => db.put(bookToDoc(book)));
       }
@@ -147,7 +147,7 @@ export const useAddBook = () => {
 
 export const useBookRefresh = () => {
   const db = usePouch();
-  const { docs, loading, error } = useFind<BookDoc>({
+  const { docs } = useFind<BookDoc>({
     selector: {
       type: "book",
       cover: { $exists: false },
@@ -175,29 +175,5 @@ export const useBookRefresh = () => {
 
       return () => clearInterval(interval);
     }
-  }, [docs]);
-};
-
-// Failed attempt at storing covers, can't download them because of CORS :(
-export const Cover = ({ id }: { id: string }) => {
-  const db = usePouch();
-  const { doc: book } = useDoc<BookDoc>(id);
-  const [image, setImage] = useState<Blob | null>(null);
-
-  const coverImageName = "cover.png";
-
-  useEffect(() => {
-    if (book) {
-      db.getAttachment(book._id, coverImageName)
-        .then((data) => {
-          if ("size" in data && data.size > 0) {
-            return db.removeAttachment(book._id, coverImageName, book._rev);
-          } else {
-          }
-        })
-        .catch((err) => {});
-    }
-  }, [book]);
-
-  return null;
+  }, [db, docs, lookups]);
 };
