@@ -1,4 +1,4 @@
-import { useDoc, usePouch, useFind, useAllDocs } from "use-pouchdb";
+import { useFind } from "use-pouchdb";
 
 import Scanner from "./Scanner";
 
