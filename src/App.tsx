@@ -2,6 +2,7 @@ import "./App.scss";
 import { useAllDocs } from "use-pouchdb";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import usePouchSync from "./hooks/pouchSync";
+import { Number } from "./widgets/Number";
 
 function App() {
   usePouchSync();
@@ -25,7 +26,9 @@ function App() {
       {isBasePath && (
         <div className="dashboard">
           <p>Welcome to the Bookkeeper app!</p>
-          <p>{docCount} books tracked</p>
+          <p>
+            <Number value={docCount} /> books tracked
+          </p>
         </div>
       )}
     </div>
