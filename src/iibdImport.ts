@@ -82,7 +82,7 @@ export const useImport = (username: string, password: string) => {
           });
         });
     }
-  }, [token, url]);
+  }, [db, token, url]);
 
   return importing;
 };

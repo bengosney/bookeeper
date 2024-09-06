@@ -18,7 +18,7 @@ export const defaultSettings = {
 };
 
 const usePouchSync = () => {
-  const [settings, _] = useLocalStorage<CouchdbSettings>("couchdb", defaultSettings);
+  const [settings] = useLocalStorage<CouchdbSettings>("couchdb", defaultSettings);
   const db = usePouch();
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const usePouchSync = () => {
 
       return () => sync.cancel();
     }
-  }, [settings]);
+  }, [db, settings]);
 };
 
 export default usePouchSync;

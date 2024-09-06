@@ -1,6 +1,6 @@
 import { useFind } from "use-pouchdb";
 import { Outlet } from "react-router-dom";
-import { BookDoc, Cover, useBookRefresh } from "../documents/book";
+import { BookDoc, useBookRefresh } from "../documents/book";
 import BookItem from "./BookItem";
 import "./BookList.scss";
 import { useState } from "react";

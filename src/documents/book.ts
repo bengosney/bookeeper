@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useReducer, useState } from "react";
-import { useDoc, useFind, usePouch } from "use-pouchdb";
-import { BaseDoc } from "./_base";
+import { useEffect, useReducer, useState } from "react";
+import { useFind, usePouch } from "use-pouchdb";
 
 export interface Book {
   authors: string[];
@@ -9,14 +8,16 @@ export interface Book {
   cover: string | undefined;
   finished?: boolean;
   _attachments?: {
-    "cover.png": {
-      content_type: "image/png";
+    [key: string]: {
+      content_type: string;
       data: string;
     };
   };
 }
 
-export interface BookDoc extends BaseDoc, Book {
+type PouchDocument<T extends {}> = T & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta;
+
+export interface BookDoc extends Omit<PouchDocument<Book>, "_rev"> {
   type: "book";
 }
 
@@ -34,6 +35,11 @@ interface GoogleBook {
   };
 }
 
+interface GoogleBookResponse {
+  items: { volumeInfo: GoogleBook }[];
+  [key: string]: any;
+}
+
 export const bookToDoc = (book: Book): BookDoc => {
   return {
     ...book,
@@ -43,20 +49,17 @@ export const bookToDoc = (book: Book): BookDoc => {
 };
 
 const emptyReturn = (): LookupReturn => ({ book: undefined, looking: true });
-const toBook = (book: Book): Book => book;
 
-const fetchFromGoogle = (code: string): Promise<Book> => {
-  return fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${code}`)
-    .then((response) => response.json())
-    .then((data) => data.items[0].volumeInfo)
-    .then((data: GoogleBook) =>
-      toBook({
-        isbn: code,
-        authors: data.authors,
-        title: data.title,
-        cover: data.imageLinks.thumbnail,
-      }),
-    );
+const fetchFromGoogle = async (code: string): Promise<Book> => {
+  const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${code}`);
+  const data = (await response.json()) as GoogleBookResponse;
+  const { volumeInfo } = data.items[0];
+  return {
+    isbn: code,
+    authors: volumeInfo.authors,
+    title: volumeInfo.title,
+    cover: volumeInfo.imageLinks.thumbnail,
+  } satisfies Book;
 };
 
 const useLookupGoogle = (code: string): LookupReturn => {
@@ -75,32 +78,31 @@ const useLookupGoogle = (code: string): LookupReturn => {
 };
 
 interface OpenBook {
-  [key: string]: {
-    title: string;
-    authors: Array<{
-      name: string;
-      url: string;
-    }>;
-    cover?: {
-      small: string;
-      medium: string;
-      large: string;
-    };
+  title: string;
+  authors: Array<{
+    name: string;
+    url: string;
+  }>;
+  cover?: {
+    small: string;
+    medium: string;
+    large: string;
   };
 }
+interface OpenBookResponse {
+  [MediaKeySystemAccess: string]: OpenBook;
+}
 
-const fetchFromOpenLibrary = (code: string): Promise<Book> => {
-  return fetch(`https://openlibrary.org/api/books?bibkeys=${code}&jscmd=data&format=json`)
-    .then((response) => response.json())
-    .then((data: OpenBook) => data[code])
-    .then((data) =>
-      toBook({
-        authors: data.authors.map((obj) => obj.name),
-        cover: data.cover?.large || undefined,
-        title: data.title,
-        isbn: code,
-      }),
-    );
+const fetchFromOpenLibrary = async (code: string): Promise<Book> => {
+  const response = await fetch(`https://openlibrary.org/api/books?bibkeys=${code}&jscmd=data&format=json`);
+  const json_response = (await response.json()) as OpenBookResponse;
+  const data = json_response[code];
+  return {
+    authors: data.authors.map((obj: any) => obj.name),
+    cover: data.cover?.large || undefined,
+    title: data.title,
+    isbn: code,
+  } satisfies Book;
 };
 
 const useLookupOpenLibrary = (code: string): LookupReturn => {
@@ -128,26 +130,35 @@ export const useBookLookup = (code: string): LookupReturn => {
   };
 };
 
-export const fetchBook = (code: string): Promise<Book> => {
-  return fetchFromGoogle(code).catch(() => fetchFromOpenLibrary(code));
+export const fetchBook = async (code: string): Promise<Book> => {
+  try {
+    return await fetchFromGoogle(code);
+  } catch {
+    return await fetchFromOpenLibrary(code);
+  }
 };
 
-export const useAddBook = () => {
+export const useAddBook = (): ((isbn: string) => Promise<PouchDocument<Book>>) => {
   const db = usePouch();
 
-  return (isbn: string) => {
-    return db.get(isbn).catch((err) => {
-      if (err.status == 404) {
+  return async (isbn: string): Promise<PouchDocument<Book>> => {
+    try {
+      return await db.get<Book>(isbn);
+    } catch (err) {
+      if ((err as any).status === 404) {
         console.log(`looking up ${isbn}`);
-        return fetchBook(isbn).then((book) => db.put(bookToDoc(book)));
+        const book = await fetchBook(isbn);
+        const meta = await db.put<Book>(bookToDoc(book));
+        return { _id: meta.id, _rev: meta.rev, ...book };
       }
-    });
+      throw err;
+    }
   };
 };
 
 export const useBookRefresh = () => {
   const db = usePouch();
-  const { docs, loading, error } = useFind<BookDoc>({
+  const { docs } = useFind<BookDoc>({
     selector: {
       type: "book",
       cover: { $exists: false },
@@ -175,29 +186,5 @@ export const useBookRefresh = () => {
 
       return () => clearInterval(interval);
     }
-  }, [docs]);
-};
-
-// Failed attempt at storing covers, can't download them because of CORS :(
-export const Cover = ({ id }: { id: string }) => {
-  const db = usePouch();
-  const { doc: book } = useDoc<BookDoc>(id);
-  const [image, setImage] = useState<Blob | null>(null);
-
-  const coverImageName = "cover.png";
-
-  useEffect(() => {
-    if (book) {
-      db.getAttachment(book._id, coverImageName)
-        .then((data) => {
-          if ("size" in data && data.size > 0) {
-            return db.removeAttachment(book._id, coverImageName, book._rev);
-          } else {
-          }
-        })
-        .catch((err) => {});
-    }
-  }, [book]);
-
-  return null;
+  }, [db, docs, lookups]);
 };
