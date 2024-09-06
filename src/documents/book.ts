@@ -49,18 +49,17 @@ export const bookToDoc = (book: Book): BookDoc => {
 };
 
 const emptyReturn = (): LookupReturn => ({ book: undefined, looking: true });
-const toBook = (book: Book): Book => book;
 
 const fetchFromGoogle = async (code: string): Promise<Book> => {
   const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${code}`);
   const data = (await response.json()) as GoogleBookResponse;
   const { volumeInfo } = data.items[0];
-  return toBook({
+  return {
     isbn: code,
     authors: volumeInfo.authors,
     title: volumeInfo.title,
     cover: volumeInfo.imageLinks.thumbnail,
-  });
+  } satisfies Book;
 };
 
 const useLookupGoogle = (code: string): LookupReturn => {
@@ -98,12 +97,12 @@ const fetchFromOpenLibrary = async (code: string): Promise<Book> => {
   const response = await fetch(`https://openlibrary.org/api/books?bibkeys=${code}&jscmd=data&format=json`);
   const json_response = (await response.json()) as OpenBookResponse;
   const data = json_response[code];
-  return toBook({
+  return {
     authors: data.authors.map((obj: any) => obj.name),
     cover: data.cover?.large || undefined,
     title: data.title,
     isbn: code,
-  });
+  } satisfies Book;
 };
 
 const useLookupOpenLibrary = (code: string): LookupReturn => {
