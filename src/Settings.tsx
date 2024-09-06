@@ -1,8 +1,9 @@
 import { QrScanner } from "@yudiel/react-qr-scanner";
-import { HTMLInputTypeAttribute, HTMLProps, InputHTMLAttributes, ReactNode, useReducer, useState } from "react";
+import { ReactNode, useReducer, useState } from "react";
 import QRCode from "react-qr-code";
 import { CouchdbSettings, defaultSettings } from "./hooks/pouchSync";
 import { useLocalStorage } from "./hooks/settings";
+import { getConfig } from "./config";
 
 import "./Settings.scss";
 
@@ -111,6 +112,8 @@ const Settings = () => {
           </div>
         ) : null}
       </div>
+      <hr />
+      <small>Build: {getConfig("build")}</small>
     </div>
   );
 };
