@@ -9,6 +9,15 @@
     gap: 0.5em;
     flex-direction: column;
 
+    &:has(> input[type="checkbox"]) {
+      flex-direction: row;
+
+      input {
+        box-shadow: none;
+        flex: 0;
+      }
+    }
+
     label {
       min-width: min-content;
       max-width: max-content;
