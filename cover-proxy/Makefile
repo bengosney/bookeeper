@@ -11,4 +11,4 @@ push: build
 	$(DOCKER) push $(DOCKER_IMAGE_NAME)
 
 run: build
-	$(DOCKER) run -d -p 9000:80 $(DOCKER_IMAGE_NAME):latest
+	$(DOCKER) run --rm -p 9000:80 $(DOCKER_IMAGE_NAME):latest
