@@ -1,14 +1,15 @@
 import { useFind } from "use-pouchdb";
 import { Outlet } from "react-router-dom";
-import { BookDoc, useBookRefresh } from "../documents/book";
+import { Book, BookDoc, useBookRefresh } from "../documents/book";
 import BookItem from "./BookItem";
 import "./BookList.scss";
 import { useState } from "react";
 import useDebounce from "../hooks/debounce";
+import { PouchDocumentRev } from "../documents/types";
 
-type BookFields = keyof BookDoc;
+type BookFields = keyof PouchDocumentRev<Book>;
 const BookList = () => {
-  const fieldList: BookFields[] = ["_id", "title", "authors", "cover", "isbn", "finished"];
+  const fieldList: BookFields[] = ["_id", "_rev", "title", "authors", "cover", "isbn", "finished"];
   useBookRefresh();
   const [_search, setSearch] = useState<string>("");
   const search = useDebounce(_search, 300);

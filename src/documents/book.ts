@@ -1,5 +1,7 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState, useRef } from "react";
 import { useFind, usePouch } from "use-pouchdb";
+import { PouchDocument, PouchDocumentRev } from "./types";
+import { useSettings } from "./settings";
 
 export interface Book {
   authors: string[];
@@ -15,9 +17,7 @@ export interface Book {
   };
 }
 
-type PouchDocument<T extends {}> = T & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta;
-
-export interface BookDoc extends Omit<PouchDocument<Book>, "_rev"> {
+export interface BookDoc extends PouchDocument<Book> {
   type: "book";
 }
 
@@ -141,7 +141,7 @@ export const fetchBook = async (code: string): Promise<Book> => {
 export const useAddBook = (): ((isbn: string) => Promise<PouchDocument<Book>>) => {
   const db = usePouch();
 
-  return async (isbn: string): Promise<PouchDocument<Book>> => {
+  return async (isbn: string): Promise<PouchDocumentRev<Book>> => {
     try {
       return await db.get<Book>(isbn);
     } catch (err) {
@@ -187,4 +187,53 @@ export const useBookRefresh = () => {
       return () => clearInterval(interval);
     }
   }, [db, docs, lookups]);
+};
+
+const getImageURL = async (imageURL: string, proxyServer?: string) => {
+  const url = proxyServer ? `${proxyServer}${imageURL.replace(/^https?:\/\//, "")}` : imageURL;
+  const response = await fetch(url);
+  return response.url;
+};
+
+export const imageBlob = async (imageURL: string, proxyServer?: string): Promise<Blob> => {
+  const url = await getImageURL(imageURL, proxyServer);
+  const response = await fetch(url);
+  return await response.blob();
+};
+
+export const useCover = (book: PouchDocumentRev<Book>): Blob | null => {
+  const db = usePouch();
+  const { settings } = useSettings();
+  const [image, setImage] = useState<Blob | null>(null);
+  const coverImageName = "book-cover.jpeg";
+  const hasAttemptedRef = useRef(false);
+
+  const funky = useMemo(() => {
+    if (settings && hasAttemptedRef.current === false) {
+      hasAttemptedRef.current = true;
+      db.getAttachment(book._id, coverImageName)
+        .then((data) => {
+          if (data instanceof Blob) {
+            setImage(data);
+          }
+        })
+        .catch((err) => {
+          if (err.status === 404 && book.cover) {
+            imageBlob(book.cover, settings.corsProxy && settings.corsProxy)
+              .then((blob) => {
+                if (blob.size > 0) {
+                  setImage(blob);
+                  console.log("putting attachment", book._id);
+                  db.putAttachment(book._id, coverImageName, book._rev, blob, blob.type);
+                }
+              })
+              .catch((err) => console.log("Fetch error", err));
+          }
+        });
+    }
+  }, [book, db, settings]);
+
+  useEffect(funky, [book, db, settings]);
+
+  return image;
 };
