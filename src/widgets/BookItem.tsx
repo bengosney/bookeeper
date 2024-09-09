@@ -1,21 +1,23 @@
 import { Link } from "react-router-dom";
-import { BookDoc } from "../documents/book";
+import { Book, useCover } from "../documents/book";
 import "./BookItem.scss";
+import { PouchDocumentRev } from "../documents/types";
 
 interface BookItemProps {
-  book: BookDoc;
+  book: PouchDocumentRev<Book>;
 }
 
 const BookCover = ({ book }: BookItemProps) => {
-  if (book.cover) {
-    return (
-      <img
-        alt={`${book.title} - ${book.authors.join(", ")}`}
-        src={book.cover.replace(/^http(s)?:/, "")}
-        loading="lazy"
-      />
-    );
+  const alt = `${book.title} - ${book.authors.join(", ")}`;
+  const cover = useCover(book);
+  if (cover) {
+    return <img alt={alt} src={URL.createObjectURL(cover)} loading="lazy" />;
   }
+
+  if (book.cover) {
+    return <img alt={alt} src={book.cover.replace(/^http(s)?:/, "")} loading="lazy" />;
+  }
+
   return (
     <span className="default">
       <span className="authors">{book.authors.join(", ")}</span>
