@@ -24,6 +24,7 @@ const BookList = () => {
     selector: {
       type: "book",
       title: { $regex: RegExp(`.*${search}.*`, "i") },
+      author: { $regex: RegExp(`.*${search}.*`, "i") },
     },
     fields: fieldList,
   });
