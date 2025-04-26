@@ -14,6 +14,7 @@ import BookList from "./widgets/BookList";
 import Settings from "./Settings";
 import Scanner from "./Scanner";
 import BookDetail from "./widgets/BookDetail";
+import ISBNInput from "./ISBNInput";
 
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
           {
             path: "scan",
             element: <Scanner on={true} modal={true} />,
+          },
+          {
+            path: "add",
+            element: <ISBNInput  modal={true} />,
           },
           {
             path: ":book_id",
