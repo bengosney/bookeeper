@@ -8,6 +8,12 @@
   flex-direction: column;
   justify-content: flex-end;
 
+  &.removed {
+    .cover {
+      opacity: 0.5;
+    }
+  }
+
   &.finished {
     .cover {
       &:after {
