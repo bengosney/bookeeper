@@ -25,11 +25,15 @@ const BookCover = ({ book }: BookItemProps) => {
 };
 
 const BookItem = ({ book }: BookItemProps) => {
-  const classes = [
-    "book",
-    book.finished && "finished",
-    book.removed && "removed",
-  ].filter(Boolean);
+  const classes = ["book"];
+
+  if (book.finished) {
+    classes.push("finished");
+  }
+
+  if (book.removed) {
+    classes.push("removed");
+  }
 
   return (
     <div className={classes.join(" ")}>
