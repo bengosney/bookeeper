@@ -8,10 +8,18 @@ import useDebounce from "../hooks/debounce";
 
 type BookFields = keyof BookDoc;
 const BookList = () => {
-  const fieldList: BookFields[] = ["_id", "title", "authors", "cover", "isbn", "finished"];
+  const fieldList: BookFields[] = ["_id", "title", "authors", "cover", "isbn", "finished", "removed"];
   useBookRefresh();
   const [_search, setSearch] = useState<string>("");
   const search = useDebounce(_search, 300);
+  const [showRemoved, setShowRemoved] = useState<boolean>(false);
+
+  const removeFilter = {
+    $or: [
+      { removed: false },
+      { removed: { $exists: false } },
+    ]
+  };
 
   const {
     docs: books,
@@ -20,9 +28,14 @@ const BookList = () => {
   } = useFind<BookDoc>({
     selector: {
       type: "book",
-      $or: [
-        { title: { $regex: RegExp(`.*${search}.*`, "i") } },
-        { authors: { $elemMatch: {$regex: RegExp(`.*${search}.*`, "i") } }},
+      $and: [
+        !showRemoved ? removeFilter : {},
+        {
+          $or: [
+            { title: { $regex: RegExp(`.*${search}.*`, "i") } },
+            { authors: { $elemMatch: { $regex: RegExp(`.*${search}.*`, "i") } } },
+          ]
+        }
       ],
     },
     fields: fieldList,
@@ -40,6 +53,10 @@ const BookList = () => {
     <>
       <div className="search-box">
         <input value={_search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search..."} />
+        <button
+          className="show-removed"
+          onClick={() => setShowRemoved((prev) => !prev)}
+        >{showRemoved ? 'Hide' : 'Show'} Removed</button>
       </div>
       <div className="books">
         {books.map((book) => (

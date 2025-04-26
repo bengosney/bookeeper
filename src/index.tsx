@@ -17,6 +17,7 @@ import BookDetail from "./widgets/BookDetail";
 import ISBNInput from "./ISBNInput";
 
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import { BookDoc } from "./documents/book";
 
 PouchDB.plugin(PouchDBFind);
 PouchDB.plugin(PouchUpsert);
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
           },
           {
             path: "add",
-            element: <ISBNInput  modal={true} />,
+            element: <ISBNInput modal={true} />,
           },
           {
             path: ":book_id",
@@ -47,15 +48,18 @@ const router = createBrowserRouter([
               return params.book_id ? await db.get(params.book_id) : null;
             },
             action: async ({ request, params }) => {
-              const formData = await request.formData();
-              const { finished = undefined } = Object.fromEntries(formData);
+              const formData = Object.fromEntries(await request.formData());
+              const { finished, removed } = formData;
 
-              if (!params.book_id || !finished) {
+              if (!params.book_id || (!finished && !removed)) {
                 return null;
               }
-              return db.upsert(params.book_id, (doc) => {
-                return { ...doc, finished: finished === "true" ? true : false };
-              });
+
+              return db.upsert(params.book_id, (doc) => ({
+                ...doc,
+                ...(finished !== undefined && { finished: finished === "true" }),
+                ...(removed !== undefined && { removed: removed === "true" }),
+              }));
             },
           },
         ],

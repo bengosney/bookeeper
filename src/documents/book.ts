@@ -7,6 +7,7 @@ export interface Book {
   isbn: string;
   cover: string | undefined;
   finished?: boolean;
+  removed?: boolean;
   _attachments?: {
     [key: string]: {
       content_type: string;
