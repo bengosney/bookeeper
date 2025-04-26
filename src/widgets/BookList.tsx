@@ -18,13 +18,12 @@ const BookList = () => {
     loading,
     error,
   } = useFind<BookDoc>({
-    index: {
-      fields: ["type", "title", "authors",],
-    },
     selector: {
       type: "book",
-      title: { $regex: RegExp(`.*${search}.*`, "i") },
-      authors: { $regex: RegExp(`.*${search}.*`, "i") },
+      $or: [
+        { title: { $regex: RegExp(`.*${search}.*`, "i") } },
+        { authors: { $elemMatch: {$regex: RegExp(`.*${search}.*`, "i") } }},
+      ],
     },
     fields: fieldList,
   });
