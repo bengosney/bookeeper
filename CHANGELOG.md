@@ -1,3 +1,16 @@
+## 1.3.2 (2025-04-27)
+
+### Fix
+
+- **Scanner**: remove unused Outlet import and add addBook to useEffect dependencies
+- **ISBNInput**: use strict equality for button disabled condition
+- **BookList**: include removeFilter in useMemo dependencies
+
+### Refactor
+
+- **index**: remove unused BookDoc import
+- **BookList**: move fieldList and removeFilter to useMemo for performance optimization
+
 ## 1.3.1 (2025-04-27)
 
 ### Fix
