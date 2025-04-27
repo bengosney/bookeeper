@@ -20,9 +20,9 @@ const BookDetail = () => {
     <div className="details">
       <div>
         <div className="info-grid">
-          <div>Title: {book.title}</div>
-          <div>Authors: {book.authors.join(", ")}</div>
-          <div>ISBN: {book.isbn}</div>
+          <div className="title"><span>Title: </span>{book.title}</div>
+          <div className="authors"><span>Authors: </span>{book.authors.map(a => a.replace(' ', '\u00A0')).join(", ")}</div>
+          <div className="isbn"><span>ISBN: </span>{book.isbn}</div>
         </div>
         <div className="buttons">
           <Form method="post" id="mark-as-read">
