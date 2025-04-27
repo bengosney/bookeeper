@@ -1,3 +1,9 @@
+## 1.3.3 (2025-04-27)
+
+### Fix
+
+- **usePouchSync**: correct URL construction for remote database connection
+
 ## 1.3.2 (2025-04-27)
 
 ### Fix
