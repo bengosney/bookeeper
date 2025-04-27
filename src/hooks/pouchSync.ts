@@ -23,7 +23,8 @@ const usePouchSync = () => {
 
   useEffect(() => {
     if (settings.database && settings.server && settings.username && settings.password) {
-      const url = settings.server.startsWith('http') ? settings.server : `https://${settings.server}/${settings.database}`;
+      const server = settings.server.startsWith('http') ? `${settings.server}` : `https://${settings.server}`;
+      const url = `${server}/${settings.database}`;
       const remoteDB = new PouchDB(url, {
         auth: {
           username: settings.username,
