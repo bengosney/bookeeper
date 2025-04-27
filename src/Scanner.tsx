@@ -1,6 +1,6 @@
 import Quagga from "@ericblade/quagga2";
 import { useEffect, useRef } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAddBook } from "./documents/book";
 
 import "./Scanner.scss";
@@ -50,7 +50,7 @@ const Scanner = ({ on = true, modal = true }: ScannerProps) => {
       Quagga.offDetected();
       Quagga.stop();
     };
-  }, [targetRef, on]);
+  }, [targetRef, on, addBook]);
 
   const classes = ["scanner"];
   if (modal) {
