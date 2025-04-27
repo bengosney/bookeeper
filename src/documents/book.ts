@@ -148,9 +148,14 @@ export const useAddBook = (): ((isbn: string) => Promise<PouchDocument<Book>>) =
     } catch (err) {
       if ((err as any).status === 404) {
         console.log(`looking up ${isbn}`);
-        const book = await fetchBook(isbn);
-        const meta = await db.put<Book>(bookToDoc(book));
-        return { _id: meta.id, _rev: meta.rev, ...book };
+        try {
+          const book = await fetchBook(isbn);
+          const meta = await db.put<Book>(bookToDoc(book));
+          return { _id: meta.id, _rev: meta.rev, ...book };
+        } catch (err) {
+          console.error("Error fetching book:", err);
+          throw new Error("Failed to fetch book");
+        }
       }
       throw err;
     }
