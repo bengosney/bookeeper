@@ -8,18 +8,18 @@ import useDebounce from "../hooks/debounce";
 
 type BookFields = keyof BookDoc;
 const BookList = () => {
-  const fieldList: BookFields[] = ["_id", "title", "authors", "cover", "isbn", "finished", "removed"];
   useBookRefresh();
   const [_search, setSearch] = useState<string>("");
   const search = useDebounce(_search, 300);
   const [showRemoved, setShowRemoved] = useState<boolean>(false);
+  const fieldList: BookFields[] = useMemo(() => ["_id", "title", "authors", "cover", "isbn", "finished", "removed"], []);
 
-  const removeFilter = {
+  const removeFilter = useMemo(() => ({
     $or: [
       { removed: false },
       { removed: { $exists: false } },
     ],
-  };
+  }), []);
   
   const searchFilter = (search: string) => ({
     $or: [
@@ -37,7 +37,7 @@ const BookList = () => {
       ],
     },
     fields: fieldList,
-  }), [search, showRemoved, fieldList]);
+  }), [search, showRemoved, fieldList, removeFilter]);
 
   const {
     docs: books,

@@ -17,7 +17,6 @@ import BookDetail from "./widgets/BookDetail";
 import ISBNInput from "./ISBNInput";
 
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
-import { BookDoc } from "./documents/book";
 
 PouchDB.plugin(PouchDBFind);
 PouchDB.plugin(PouchUpsert);
