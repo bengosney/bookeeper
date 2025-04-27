@@ -33,7 +33,7 @@ const BookList = () => {
       $and: [
         { type: "book" },
         ...(showRemoved ? [] : [removeFilter]),
-        search ? searchFilter(search) : {},
+        search ? searchFilter(search.trim()) : {},
       ],
     },
     fields: fieldList,
