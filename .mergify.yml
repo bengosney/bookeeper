@@ -1,0 +1,8 @@
+pull_request_rules:
+- name: Merge Mine
+  conditions:
+  - and:
+    - author~=^bengosney$
+  actions:
+    merge:
+      method: merge
