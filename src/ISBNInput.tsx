@@ -22,7 +22,7 @@ const ISBNInput = ({ modal = true }: ISBNInputProps) => {
         <div className={classes.join(" ")}>
             <div>
                 <input autoFocus value={isbn} onChange={(e) => setIsbn(e.target.value)} placeholder="Enter ISBN" />
-                <button disabled={isbn == ""} onClick={() => {
+                <button disabled={isbn === ""} onClick={() => {
                     if (isbn) {
                         addBook(isbn).then(() => navigate("../"));
                     }
