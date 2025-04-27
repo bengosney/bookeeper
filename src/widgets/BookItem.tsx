@@ -16,9 +16,12 @@ const BookCover = ({ book }: BookItemProps) => {
       />
     );
   }
+
+  const authors = book.authors?.join(", ");
+
   return (
     <span className="default">
-      <span className="authors">{book.authors?.join(", ")}</span>
+      {authors && <span className="authors">{authors}</span>}
       <span className="title">{book.title}</span>
     </span>
   );
