@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { BookDoc, useBookRefresh } from "../documents/book";
 import BookItem from "./BookItem";
 import "./BookList.scss";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import useDebounce from "../hooks/debounce";
 
 type BookFields = keyof BookDoc;
@@ -18,28 +18,32 @@ const BookList = () => {
     $or: [
       { removed: false },
       { removed: { $exists: false } },
-    ]
+    ],
   };
+  
+  const searchFilter = (search: string) => ({
+    $or: [
+      { title: { $regex: new RegExp(`.*${search}.*`, "i") } },
+      { authors: { $elemMatch: { $regex: new RegExp(`.*${search}.*`, "i") } } },
+    ],
+  });
+  
+  const queryObject = useMemo(() => ({
+    selector: {
+      $and: [
+        { type: "book" },
+        ...(showRemoved ? [] : [removeFilter]),
+        search ? searchFilter(search) : {},
+      ],
+    },
+    fields: fieldList,
+  }), [search, showRemoved, fieldList]);
 
   const {
     docs: books,
     loading,
     error,
-  } = useFind<BookDoc>({
-    selector: {
-      type: "book",
-      $and: [
-        !showRemoved ? removeFilter : {},
-        {
-          $or: [
-            { title: { $regex: RegExp(`.*${search}.*`, "i") } },
-            { authors: { $elemMatch: { $regex: RegExp(`.*${search}.*`, "i") } } },
-          ]
-        }
-      ],
-    },
-    fields: fieldList,
-  });
+  } = useFind<BookDoc>(queryObject);
 
   if (error && !loading) {
     return <div>something went wrong: {error.message}</div>;
