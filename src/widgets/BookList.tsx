@@ -37,7 +37,7 @@ const BookList = () => {
       ],
     },
     fields: fieldList,
-  }), [search, showRemoved, fieldList]);
+  }), [search, showRemoved, fieldList, removeFilter]);
 
   const {
     docs: books,
