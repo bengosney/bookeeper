@@ -20,18 +20,18 @@ const BookList = () => {
       { removed: { $exists: false } },
     ],
   }), []);
-  
+
   const searchFilter = (search: string) => ({
     $or: [
       { title: { $regex: new RegExp(`.*${search}.*`, "i") } },
       { authors: { $elemMatch: { $regex: new RegExp(`.*${search}.*`, "i") } } },
     ],
   });
-  
+
   const queryObject = useMemo(() => ({
     selector: {
       $and: [
-        { type: "book" },
+        { type: { $in: ["book", "pending-book"] } },
         ...(showRemoved ? [] : [removeFilter]),
         search ? searchFilter(search.trim()) : {},
       ],

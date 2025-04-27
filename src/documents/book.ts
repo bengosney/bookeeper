@@ -22,6 +22,10 @@ export interface BookDoc extends Omit<PouchDocument<Book>, "_rev"> {
   type: "book";
 }
 
+export interface PendingBookDoc extends Omit<PouchDocument<Book>, "_rev"> {
+  type: "pending-book";
+}
+
 export interface LookupReturn {
   book: Book | undefined;
   looking: boolean;
@@ -48,6 +52,17 @@ export const bookToDoc = (book: Book): BookDoc => {
     _id: book.isbn,
   };
 };
+
+const isbnToPending = (isbn: string): PendingBookDoc => {
+  return {
+    type: "pending-book",
+    _id: isbn,
+    authors: [],
+    title: `Pending... ${isbn}`,
+    isbn: isbn,
+    cover: undefined,
+  };
+}
 
 const emptyReturn = (): LookupReturn => ({ book: undefined, looking: true });
 
@@ -147,10 +162,15 @@ export const useAddBook = (): ((isbn: string) => Promise<PouchDocument<Book>>) =
       return await db.get<Book>(isbn);
     } catch (err) {
       if ((err as any).status === 404) {
-        console.log(`looking up ${isbn}`);
-        const book = await fetchBook(isbn);
-        const meta = await db.put<Book>(bookToDoc(book));
-        return { _id: meta.id, _rev: meta.rev, ...book };
+        try {
+          const book = await fetchBook(isbn);
+          const meta = await db.put<Book>(bookToDoc(book));
+          return { _id: meta.id, _rev: meta.rev, ...book };
+        } catch (err) {
+          const pending = isbnToPending(isbn);
+          const meta = await db.put<Book>(pending);
+          return { ...pending, _id: meta.id, _rev: meta.rev };
+        }
       }
       throw err;
     }
